@@ -37,6 +37,10 @@ const commands = [
                 .setName("user")
                 .setDescription("User")
                 .setRequired(true)),
+                
+    new SlashCommandBuilder()
+        .setName("new")
+        .setDescription("Creates a new character")
 
 ].map(command => command.toJSON());
 

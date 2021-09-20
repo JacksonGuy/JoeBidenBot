@@ -1,5 +1,8 @@
 const { Client, Intents } = require('discord.js');
 const { token } = require("./config.json");
+const { gamePlayers } = require("./gamePlayers.json")
+const fs = require('fs');
+const playerTools = require('./playerTools');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -42,6 +45,38 @@ client.on('interactionCreate', async interaction => {
                 });
             });
             await interaction.reply(`Deleting messages from ${interaction.options.getString('user')}`);
+            break;
+
+        case 'new':
+            user = interaction.message.user.id;
+            if (user in gamePlayers) {
+                // Delete current clientID.json and create new one
+                fs.unlink(`${user}.json`, (err) => {
+                    if (err) {
+                        console.log(err);
+                        return;
+                    }
+                });
+                playerTools.createPlayer(user);
+                await interaction.reply('New Character Created');
+            }
+            else {
+                // Create new entry in gamePlayers.json
+                fs.readFile('gamePlayers.json','utf-8', (err, data) => {
+                    if (err) console.log(err);
+                    else {
+                        obj = JSON.parse(data);
+                        obj.players.push(user);
+                        json = JSON.stringify(obj);
+                        fs.writeFile('gamePlayers.json', json, 'utf-8', callback);
+                    }
+                });
+
+                // create new JSON file for client --> (clientID.json)
+                playerTools.createPlayer(user);
+
+                await interaction.reply('New Character Created');
+            }
             break;
     }
 });

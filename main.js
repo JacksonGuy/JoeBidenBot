@@ -1,6 +1,6 @@
 const { Client, Intents } = require('discord.js');
 const { token } = require("./config.json");
-const { gamePlayers } = require("./gamePlayers.json")
+const gamePlayers  = require("./gamePlayers.json")
 const fs = require('fs');
 const playerTools = require('./playerTools');
 
@@ -16,7 +16,8 @@ client.on('interactionCreate', async interaction => {
 
     switch(interaction.commandName) {
         case 'test':
-            await interaction.reply('yep it works');
+            await interaction.reply("oh boy hopefully everything works");
+            console.log(interaction.user.id in gamePlayers.players); // TODO WHY WONT THIS WORK
             break;
 
         case 'erase':
@@ -48,17 +49,15 @@ client.on('interactionCreate', async interaction => {
             break;
 
         case 'new':
-            user = interaction.message.user.id;
-            if (user in gamePlayers) {
+            user = interaction.user.id;
+
+            if (gamePlayers.players.hasOwnProperty(user)) {
                 // Delete current clientID.json and create new one
                 fs.unlink(`${user}.json`, (err) => {
-                    if (err) {
-                        console.log(err);
-                        return;
-                    }
+                    if (err) throw err;
                 });
                 playerTools.createPlayer(user);
-                await interaction.reply('New Character Created');
+                await interaction.reply(`New Character Created for ${user}`);
             }
             else {
                 // Create new entry in gamePlayers.json
@@ -68,7 +67,9 @@ client.on('interactionCreate', async interaction => {
                         obj = JSON.parse(data);
                         obj.players.push(user);
                         json = JSON.stringify(obj);
-                        fs.writeFile('gamePlayers.json', json, 'utf-8', callback);
+                        fs.writeFile('gamePlayers.json', json, (err) => {
+                            if (err) throw err;
+                        });
                     }
                 });
 

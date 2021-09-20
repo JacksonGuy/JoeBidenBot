@@ -18,5 +18,7 @@ exports.createPlayer = function (user) {
         "location" : "town"
     };
     let json = JSON.stringify(obj);
-    fs.writeFile(`${user}.json`, json, 'utf-8', callback);
+    fs.writeFile(`./players/${user}.json`, json, (err) => {
+        if (err) throw err;
+    });
 }

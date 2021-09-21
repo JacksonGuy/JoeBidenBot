@@ -1,0 +1,13 @@
+Messages embeds
+buttons instead of text commands? (especially for movement)
+random incounters while move()ing 
+option turned based or instant combat?
+wander() --> move() in random direction
+use() items from inventory
+list character, inventory
+character stats?
+    - str, agi, stam, etc...
+    - gear?
+buy items while in town
+pvp battles
+dungeons/raids

@@ -1,13 +1,13 @@
 const { Client, Intents } = require('discord.js');
 const { token } = require("./config.json");
-const gamePlayers  = require("./gamePlayers.json")
 const fs = require('fs');
 const playerTools = require('./playerTools');
+const enemy = require('./enemy');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`Logged in as ${client.user.tag}`);
     client.user.setActivity('im back losers', { type: 'PLAYING' });
 });
 
@@ -17,7 +17,6 @@ client.on('interactionCreate', async interaction => {
     switch(interaction.commandName) {
         case 'test':
             await interaction.reply("oh boy hopefully everything works");
-            console.log(interaction.user.id in gamePlayers.players); // TODO WHY WONT THIS WORK
             break;
 
         case 'erase':
@@ -49,36 +48,41 @@ client.on('interactionCreate', async interaction => {
             break;
 
         case 'new':
-            user = interaction.user.id;
+            playerTools.createPlayer(interaction.user.id);
+            await interaction.reply('New Characher Created');
+            break;
 
-            if (gamePlayers.players.hasOwnProperty(user)) {
-                // Delete current clientID.json and create new one
-                fs.unlink(`${user}.json`, (err) => {
+        case 'move':
+            fs.readFile(`./players/${interaction.user.id}.json`, (err, data) => {
+                if (err) throw err;
+                player = JSON.parse(data);
+            
+                switch (interaction.options.getString('direction')) {
+                    case 'north':
+                        player.position.location = "wilderness"
+                        player.position.y += 1;
+                        break;
+                    case 'south':
+                        player.position.location = "wilderness"
+                        player.position.y -= 1;
+                        break;
+                    case 'east':
+                        player.position.location = "wilderness"
+                        player.position.x += 1;
+                        break;
+                    case 'west':
+                        player.position.location = "wilderness"
+                        player.position.x -= 1;
+                        break;
+                }
+                console.log(player);
+                player = JSON.stringify(player);
+                fs.writeFile(`./players/${interaction.user.id}.json`, player, (err) => {
                     if (err) throw err;
                 });
-                playerTools.createPlayer(user);
-                await interaction.reply(`New Character Created for ${user}`);
-            }
-            else {
-                // Create new entry in gamePlayers.json
-                fs.readFile('gamePlayers.json','utf-8', (err, data) => {
-                    if (err) console.log(err);
-                    else {
-                        obj = JSON.parse(data);
-                        obj.players.push(user);
-                        json = JSON.stringify(obj);
-                        fs.writeFile('gamePlayers.json', json, (err) => {
-                            if (err) throw err;
-                        });
-                    }
-                });
-
-                // create new JSON file for client --> (clientID.json)
-                playerTools.createPlayer(user);
-
-                await interaction.reply('New Character Created');
-            }
-            break;
+                interaction.reply(`Move Successful`);
+            });
+            break; 
     }
 });
 

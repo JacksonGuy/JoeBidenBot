@@ -40,7 +40,17 @@ const commands = [
                 
     new SlashCommandBuilder()
         .setName("new")
-        .setDescription("Creates a new character")
+        .setDescription("Creates a new character"),
+
+    new SlashCommandBuilder()
+        .setName("move")
+        .setDescription("Moves player in a direction")
+        .addStringOption(option =>
+            option
+                .setName("direction")
+                .setDescription("Direction to move in")
+                .setRequired(true)),
+
 
 ].map(command => command.toJSON());
 

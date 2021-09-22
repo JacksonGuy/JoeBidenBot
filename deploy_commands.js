@@ -51,6 +51,22 @@ const commands = [
                 .setDescription("Direction to move in")
                 .setRequired(true)),
 
+    new SlashCommandBuilder()
+        .setName("inspect")
+        .setDescription("Inspects a player character")
+        .addStringOption(option => 
+            option
+                .setName("player")
+                .setDescription("Player to inspect")
+                .setRequired(true)),
+    
+    new SlashCommandBuilder()
+        .setName("inventory")
+        .setDescription("Shows player inventory"),
+
+    new SlashCommandBuilder()
+        .setName("location")
+        .setDescription("View current location"),
 
 ].map(command => command.toJSON());
 

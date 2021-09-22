@@ -1,15 +1,20 @@
-class Enemy {
-    constructor(level) {
-        this.level = level;
-        this.health = 10 * level;
-        this.damage = 1 * level;
-    }
+const tools = require("./tools");
 
-    get attack() {
-        return this.damage;
-    }
+exports.Encounter = function () {
+    this.id = tools.randomNum(1000000000000000000);
+    this.enemies = [];
 }
 
-function randomEncounter() {
-    
+exports.createEnemy = function(level, encounter) {
+    let obj = {
+        "id" : tools.randomNum(1000000000000000000),
+        "encounterId" : encounter.id,
+        "level" : level,
+        "maxHealth" : 10 * level,
+        "health" : 10 * level,
+        "damage" : 1 * level
+    }
+
+    encounter.enemies.push(obj.id);
+    tools.writeEnemyData(obj.id, obj);
 }

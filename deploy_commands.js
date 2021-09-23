@@ -68,6 +68,20 @@ const commands = [
         .setName("location")
         .setDescription("View current location"),
 
+    new SlashCommandBuilder()
+        .setName("cast")
+        .setDescription("Casts a spell")
+        .addStringOption(option => 
+            option
+                .setName("spell")
+                .setDescription("Spell to cast")
+                .setRequired(true))
+        .addStringOption(option => 
+            option
+                .setName("target")
+                .setDescription("Enemy to cast spell on")
+                .setRequired(true)),
+
 ].map(command => command.toJSON());
 
 const rest = new REST({ version: '9' }).setToken(token);

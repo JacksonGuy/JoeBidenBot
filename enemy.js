@@ -1,12 +1,18 @@
 const tools = require("./tools");
+const fs = require('fs');
 
 exports.Encounter = function () {
-    this.id = tools.randomNum(1000000000000000000);
-    this.enemies = [];
+    let obj = {
+        "id" : tools.randomNum(1000000000000000000),
+        "enemyName" : {}
+    }
+    tools.writeEncounterData(obj.id, obj);
+    return obj;
 }
 
-exports.createEnemy = function(level, encounter) {
+exports.createEnemy = function(name, level, encounter) {
     let obj = {
+        "name" : name,
         "id" : tools.randomNum(1000000000000000000),
         "encounterId" : encounter.id,
         "level" : level,
@@ -14,7 +20,12 @@ exports.createEnemy = function(level, encounter) {
         "health" : 10 * level,
         "damage" : 1 * level
     }
-
-    encounter.enemies.push(obj.id);
-    tools.writeEnemyData(obj.id, obj);
+    fs.readFile(`./encounters/${encounter.id}.json`, (err, data) => {
+        if (err) throw err;
+        let e = JSON.parse(data);
+        e.enemyName[obj.name] = obj.id;
+        tools.writeEncounterData(e.id, e);
+        tools.writeEnemyData(obj.id, obj);
+    });
+    return obj;
 }

@@ -2,6 +2,7 @@ const tools = require('./tools');
 
 exports.createPlayer = function (user) {
     let obj = {
+        "id" : user,
         "level" : 1,
         "experience" : 0,
         "nextLevelXP" : 10,

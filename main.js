@@ -4,6 +4,7 @@ const fs = require('fs');
 const tools = require('./tools');
 const player = require('./player');
 const { Encounter, createEnemy} = require('./enemy');
+const { castSpell } = require('./spells');
 
 const ENCOUNTERCHANCE = 0; 
 
@@ -93,10 +94,10 @@ client.on('interactionCreate', async interaction => {
                 // Random Encounter Chance
                 let random = tools.randomNum(ENCOUNTERCHANCE);
                 if (random === 0) { // Encounter
-                    interaction.reply("Encounter!\nYou are now in combat");
-                    let e = new Encounter();
-                    createEnemy(p.level, e);
+                    let e = Encounter();
+                    let skeleton = createEnemy("Skeleton", p.level, e);
                     p.instanceID = e.id;
+                    interaction.reply(`Encounter!\nYou are now in combat\n${skeleton.name} - Health: ${skeleton.health}/${skeleton.maxHealth}`);
                 }
                 else {
                     if (interaction.options.getString('direction') === "town") {
@@ -162,6 +163,27 @@ client.on('interactionCreate', async interaction => {
                 }
             });
             break;
+
+        case "cast":
+            // So many readFile's 
+            // Makes my head hurt that this is the best I could come up with
+            // Also fuck async programming
+            fs.readFile(`./players/${interaction.user.id}.json`, (err, data) => {
+                if (err) throw err;
+                let p = JSON.parse(data);
+                let spell = interaction.options.getString('spell');
+                fs.readFile(`./encounters/${p.instanceID}.json`, (err, data) => {
+                    if (err) throw err;
+                    let encounter = JSON.parse(data);
+                    let enemyID = encounter.enemyName[interaction.options.getString('target')];
+                    fs.readFile(`./enemies/${enemyID}.json`, (err, data) => {
+                        if (err) throw err;
+                        let target = JSON.parse(data);
+                        result = castSpell(spell, p, target);
+                        interaction.reply(`Hit target with ${spell} for ${result} damage!\n${target.name} - Health: ${target.health}/${target.maxHealth}`);
+                    });
+                });
+            });
     }
 });
 

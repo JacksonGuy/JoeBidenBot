@@ -3,7 +3,7 @@ const { token } = require("./config.json");
 const fs = require('fs');
 const tools = require('./tools');
 const player = require('./player');
-const { Encounter, createEnemy} = require('./enemy');
+const { Encounter, createEnemy, enemyResponse } = require('./enemy');
 const { castSpell } = require('./spells');
 
 const ENCOUNTERCHANCE = 0; 
@@ -95,6 +95,7 @@ client.on('interactionCreate', async interaction => {
                 let random = tools.randomNum(ENCOUNTERCHANCE);
                 if (random === 0) { // Encounter
                     let e = Encounter();
+                    e.players.push(p.id);
                     let skeleton = createEnemy("Skeleton", p.level, e);
                     p.instanceID = e.id;
                     interaction.reply(`Encounter!\nYou are now in combat\n${skeleton.name} - Health: ${skeleton.health}/${skeleton.maxHealth}`);
@@ -107,7 +108,6 @@ client.on('interactionCreate', async interaction => {
                         interaction.reply("Move Successful");
                     }
                 }
-
                 tools.writePlayerData(interaction.user.id, p);
             });
             break; 
@@ -133,8 +133,13 @@ client.on('interactionCreate', async interaction => {
                 fs.readFile(`./players/${pid}.json`, (err, data) => {
                     if (err) throw err;
                     let p = JSON.parse(data);
-                    // Change this when figure out how embeds work
-                    interaction.reply(`Level: ${p.level}\nGold: ${p.gold}\nStrength: ${p.stats.Strength}\nStamina: ${p.stats.Stamina}\nAgility: ${p.stats.Agility}\nIntelligence: ${p.stats.Intelligence}`);
+                    interaction.reply(`
+                    Level: ${p.level}
+                    Gold: ${p.gold}
+                    Strength: ${p.stats.Strength}
+                    Stamina: ${p.stats.Stamina}
+                    Agility: ${p.stats.Agility}
+                    Intelligence: ${p.stats.Intelligence}`);
                 });
             }
             break;
@@ -181,6 +186,7 @@ client.on('interactionCreate', async interaction => {
                         let target = JSON.parse(data);
                         result = castSpell(spell, p, target);
                         interaction.reply(`Hit target with ${spell} for ${result} damage!\n${target.name} - Health: ${target.health}/${target.maxHealth}`);
+                        enemyResponse(encounter);
                     });
                 });
             });

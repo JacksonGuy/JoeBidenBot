@@ -4,13 +4,14 @@ const fs = require('fs');
 exports.Encounter = function () {
     let obj = {
         "id" : tools.randomNum(1000000000000000000),
-        "enemyName" : {}
+        "enemyName" : {},
+        "players" : []
     }
     tools.writeEncounterData(obj.id, obj);
     return obj;
 }
 
-exports.createEnemy = function(name, level, encounter) {
+exports.createEnemy = function (name, level, encounter) {
     let obj = {
         "name" : name,
         "id" : tools.randomNum(1000000000000000000),
@@ -28,4 +29,10 @@ exports.createEnemy = function(name, level, encounter) {
         tools.writeEnemyData(obj.id, obj);
     });
     return obj;
+}
+
+exports.enemyResponse = function (encounter) {
+    for (let i in encounter.enemyName) {
+        console.log(i);
+    }
 }

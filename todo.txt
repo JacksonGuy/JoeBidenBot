@@ -4,8 +4,9 @@ non required command options (for when target doesn't need to be specified in co
 what happens when player that doesn't exist tries to send commands?
 
 how enemies are created needs to change to allow for more customization (name, health, damage, etc)
-enemies attack back
-enemy on kill behavior
+enemy attack message
+enemy on kill behavior + message
+leveling up on kill
 
 wander() --> move() in random direction (or just instant trigger encounter and add random numbers to position)
 

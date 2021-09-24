@@ -96,6 +96,7 @@ client.on('interactionCreate', async interaction => {
                 if (random === 0) { // Encounter
                     let e = Encounter();
                     e.players.push(p.id);
+                    tools.writeEncounterData(e.id, e);
                     let skeleton = createEnemy("Skeleton", p.level, e);
                     p.instanceID = e.id;
                     interaction.reply(`Encounter!\nYou are now in combat\n${skeleton.name} - Health: ${skeleton.health}/${skeleton.maxHealth}`);
@@ -119,7 +120,7 @@ client.on('interactionCreate', async interaction => {
                     if (err) throw err;
                     let p = JSON.parse(data);
                     interaction.reply(`
-                    Health: ${p.health}/${p.maxHealh}
+                    Health: ${p.health}/${p.maxHealth}
                     Mana: ${p.mana}/${p.maxMana}
                     Level: ${p.level}\nGold: ${p.gold}
                     Strength: ${p.stats.Strength}
@@ -185,11 +186,34 @@ client.on('interactionCreate', async interaction => {
                         if (err) throw err;
                         let target = JSON.parse(data);
                         result = castSpell(spell, p, target);
-                        interaction.reply(`Hit target with ${spell} for ${result} damage!\n${target.name} - Health: ${target.health}/${target.maxHealth}`);
-                        enemyResponse(encounter);
+                        // interaction.reply(`Hit target with ${spell} for ${result} damage!\n${target.name} - Health: ${target.health}/${target.maxHealth}`);
+
+                        // Check if enemy died to player attack
+                        if (target.health <= 0) {                                   // Enemy died
+                            delete encounter.enemyName[target.name];                // Remove enemy from encounter
+                            if (encounter.enemyName.length <= 0) {                  // Delete encounter and remove player from combat if no enemies left
+                                fs.unlink(`./encounters/${encounter.id}.json`, (err) => {
+                                    if (err) throw err;
+                                    return;                                          // Encounter no longer exists so no response
+                                });
+                                p.instanceID = 0;
+                            }
+                            else {
+                                tools.writeEncounterData(encounter.id, encounter);
+                            }
+                            fs.unlink(`./enemies/${target.id}.json`, (err) => {     // Delete enemy file
+                                if (err) throw err;
+                            });
+                        }
+
+                        r = enemyResponse(encounter);
+                        interaction.reply(`
+                        Hit target with ${spell} for ${result} damage!\n${target.name} - Health: ${target.health}/${target.maxHealth}
+                        ${interaction.user} was hit for ${r} damage!`);
                     });
                 });
             });
+            break;
     }
 });
 

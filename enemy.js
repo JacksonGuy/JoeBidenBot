@@ -31,8 +31,41 @@ exports.createEnemy = function (name, level, encounter) {
     return obj;
 }
 
-exports.enemyResponse = function (encounter) {
+exports.enemyResponse = function (encounter, interaction) {
     for (let i in encounter.enemyName) {
-        console.log(i);
+        fs.readFile(`./enemies/${encounter.enemyName[i]}.json`, (err, data) => {
+            if (err) throw err;
+            let enemy = JSON.parse(data);
+            let pid = encounter.players[Math.floor(Math.random()*encounter.players.length)];
+            fs.readFile(`./players/${pid}.json`, (err, data) => {
+                if (err) throw err;
+                let player = JSON.parse(data);
+                player.health -= enemy.damage;
+                
+                if (player.health <= 0) {                       // Check if player died to attack
+                    encounter.players.pop(player.id);           // Remove player from encounter
+                    if (encounter.players.length <= 0) {        // If no remaining players in encounter, delete encounter + enemies
+                        for (let i in encounter.enemyName) {
+                            fs.unlink(`./enemies/${encounter.enemyName[i]}.json`, (err) => {
+                                if (err) throw err;
+                            });
+                        }
+                        fs.unlink(`./encounters/${encounter.id}.json`, (err) => {
+                            if (err) throw err;
+                        });
+                    }
+                    else {
+                        tools.writeEncounterData(encounter.id, encounter);
+                    }
+                    fs.unlink(`./players/${player.id}.json`, (err) => {     // Delete player file
+                        if (err) throw err;
+                    });
+                }
+                else {
+                    tools.writePlayerData(player.id, player);
+                }
+                return enemy.damage; // TODO: This is undefined?
+            });
+        });
     }
 }

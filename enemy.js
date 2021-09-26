@@ -32,6 +32,7 @@ exports.createEnemy = function (name, level, encounter) {
 }
 
 exports.enemyResponse = function (encounter, interaction) {
+    var totalDamage = 0;
     for (let i in encounter.enemyName) {
         fs.readFile(`./enemies/${encounter.enemyName[i]}.json`, (err, data) => {
             if (err) throw err;
@@ -41,6 +42,7 @@ exports.enemyResponse = function (encounter, interaction) {
                 if (err) throw err;
                 let player = JSON.parse(data);
                 player.health -= enemy.damage;
+                totalDamage += enemy.damage;
                 
                 if (player.health <= 0) {                       // Check if player died to attack
                     encounter.players.pop(player.id);           // Remove player from encounter
@@ -64,8 +66,8 @@ exports.enemyResponse = function (encounter, interaction) {
                 else {
                     tools.writePlayerData(player.id, player);
                 }
-                return enemy.damage; // TODO: This is undefined?
             });
         });
     }
+    return totalDamage;
 }

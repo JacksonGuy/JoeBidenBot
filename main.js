@@ -186,7 +186,6 @@ client.on('interactionCreate', async interaction => {
                         if (err) throw err;
                         let target = JSON.parse(data);
                         result = castSpell(spell, p, target);
-                        // interaction.reply(`Hit target with ${spell} for ${result} damage!\n${target.name} - Health: ${target.health}/${target.maxHealth}`);
 
                         // Check if enemy died to player attack
                         if (target.health <= 0) {                                   // Enemy died
@@ -206,10 +205,13 @@ client.on('interactionCreate', async interaction => {
                             });
                         }
 
-                        r = enemyResponse(encounter);
-                        interaction.reply(`
-                        Hit target with ${spell} for ${result} damage!\n${target.name} - Health: ${target.health}/${target.maxHealth}
-                        ${interaction.user} was hit for ${r} damage!`);
+                        enemyResponse(encounter, (data) => {
+                            interaction.reply(`
+                            Hit target with ${spell} for ${result} damage!
+                            ${target.name} - Health: ${target.health}/${target.maxHealth}
+                            ${interaction.user} was hit for ${p.health-data} damage!
+                            Their health is now ${data}/${p.maxHealth}`);
+                        });
                     });
                 });
             });

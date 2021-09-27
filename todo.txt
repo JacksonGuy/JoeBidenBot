@@ -1,10 +1,9 @@
 Messages embeds
 buttons instead of text commands? (especially for movement)
 non required command options (for when target doesn't need to be specified in combat)
-what happens when player that doesn't exist tries to send commands?
 
 how enemies are created needs to change to allow for more customization (name, health, damage, etc)
-enemy attack message
+error when creating enemies on new instance
 enemy on kill behavior + message
 leveling up on kill
 

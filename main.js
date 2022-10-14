@@ -1,17 +1,15 @@
-const { Client, Intents } = require('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 const { token } = require("./config.json");
 const fs = require('fs');
 
 let leagueServers = require("./leagueServers.json");
 
-const botIntents = new Intents();
-botIntents.add(
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_PRESENCES, 
-    Intents.FLAGS.GUILD_MEMBERS);
-
-const client = new Client({ intents: botIntents });
+const client = new Client({ intents: [
+	GatewayIntentBits.Guilds,
+	GatewayIntentBits.GuildMessages,
+	GatewayIntentBits.GuildPresences,
+	GatewayIntentBits.GuildMembers,
+]});
 
 const prefix = "$";
 

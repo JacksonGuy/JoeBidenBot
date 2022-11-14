@@ -1,57 +1,35 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const { clientId, guildId, token } = require('./config.json');
+const { REST, Routes } = require('discord.js');
+const fs = require('node:fs');
+const { clientId, token, guildId} = require('./config.json');
 
-const commands = [
-    new SlashCommandBuilder().setName("test").setDescription("Test command"),
+const commands = [];
+// Grab all the command files from the commands directory you created earlier
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-    new SlashCommandBuilder()
-        .setName("erase")
-        .setDescription("Removes specified amount of messages")
-        .addIntegerOption(option => 
-            option
-                .setName("amount")
-                .setDescription("Amount of messages to remove")
-                .setRequired(true)),
+// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	commands.push(command.data.toJSON());
+}
 
-    new SlashCommandBuilder()
-        .setName("spam")
-        .setDescription("Spams messages in a channel")
-        .addStringOption(option => 
-            option
-                .setName("message")
-                .setDescription("Message to spam")
-                .setRequired(true))
-        .addIntegerOption(option => 
-            option
-                .setName("amount")
-                .setDescription("Number of messages to send")
-                .setRequired(true)),
+// Construct and prepare an instance of the REST module
+const rest = new REST({ version: '10' }).setToken(token);
 
-    new SlashCommandBuilder()
-        .setName("stalin")
-        .setDescription("Removes messages by a specified user")
-        .addStringOption(option =>
-            option
-                .setName("user")
-                .setDescription("User")
-                .setRequired(true)),
-
-].map(command => command.toJSON());
-
-const rest = new REST({ version: '9' }).setToken(token);
-
+// and deploy your commands!
 (async () => {
 	try {
-		await rest.put(
+		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+		// The put method is used to fully refresh all commands in the guild with the current set
+		const data = await rest.put(
 			Routes.applicationGuildCommands(clientId, guildId),
-            // Routes.applicationCommands(clientId),
-			{ body: commands },
+			//Routes.applicationCommands(clientId),
+            { body: commands },
 		);
 
-		console.log('Successfully registered application commands.');
+		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
 	} catch (error) {
+		// And of course, make sure you catch and log any errors!
 		console.error(error);
 	}
 })();

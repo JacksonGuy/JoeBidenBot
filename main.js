@@ -3,6 +3,7 @@ const { token } = require("./config.json");
 const fs = require('node:fs');
 const path = require('node:path');
 
+//const tools = require("./tools.js");
 
 const client = new Client({ intents: [
 	GatewayIntentBits.Guilds,

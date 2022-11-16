@@ -1,6 +1,23 @@
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require("fs");
 
+var bal_data;
+var item_data;
+var player_items;
+
+fs.readFile('./data/balance_data.json', (err, data) => {
+    if (err) throw err;
+    bal_data = JSON.parse(data);
+});
+fs.readFile('./data/item_data.json', (err, data) => {
+    if (err) throw err;
+    item_data = JSON.parse(data);
+});
+fs.readFile("./data/player_item_data.json", (err, data) => {
+    if (err) throw err;
+    player_items = JSON.parse(data);
+});
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("buy")
@@ -19,23 +36,6 @@ module.exports = {
                 .setName("max")
                 .setDescription("Buy maximum amount of the item")),
         async execute(interaction) {
-            var bal_data;
-            var item_data;
-            var player_items;
-
-            fs.readFile('./data/balance_data.json', (err, data) => {
-                if (err) throw err;
-                bal_data = JSON.parse(data);
-            });
-            fs.readFile('./data/item_data.json', (err, data) => {
-                if (err) throw err;
-                item_data = JSON.parse(data);
-            });
-            fs.readFile("./data/player_item_data.json", (err, data) => {
-                if (err) throw err;
-                player_items = JSON.parse(data);
-            });
-
             let item = interaction.options.getString("item");
             let item_cost = item_data[item];
 

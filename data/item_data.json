@@ -1,5 +1,14 @@
 {
-    "item 1" : 10,
-    "item 2" : 100,
-    "item 3" : 1000
+    "item 1" : {
+        "price" : 10,
+        "income" : 1
+    },
+    "item 2" : {
+        "price" : 100,
+        "income" : 10
+    },
+    "item 3" : {
+        "price" : 1000,
+        "income" : 100
+    }
 }

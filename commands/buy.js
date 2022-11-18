@@ -37,7 +37,7 @@ module.exports = {
                 .setDescription("Buy maximum amount of the item")),
         async execute(interaction) {
             let item = interaction.options.getString("item");
-            let item_cost = item_data[item];
+            let item_cost = item_data[item]["price"];
 
             let server = interaction.guild;
             let author = interaction.user;

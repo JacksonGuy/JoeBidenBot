@@ -22,11 +22,11 @@ module.exports = {
                     let player_items = JSON.parse(data2);
                     let last_time = time_data[server.id][author.id];
                     let time = Math.floor( (Date.now() - last_time) / 1000); // in seconds
-                    let income = 1;
+                    var income = 0;
                     // Update player income
                     for (let item in player_items[server.id][author.id]) {
                         // $$ per item * amount of that item * amount of time
-                        income += (item_data[item]["income"] * player_items[server.id][user][item]) * time
+                        income += (item_data[item]["income"] * player_items[server.id][author.id][item]) * time;
                     }
                     // Update player time
                     time_data[server.id][author.id] = Date.now();

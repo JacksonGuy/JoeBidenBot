@@ -19,7 +19,7 @@ module.exports = {
         .addStringOption(option =>
             option
                 .setName("amount")
-                .setDescription("The amount of the item to buy (put 0 to buy maximum amount)")),
+                .setDescription("The amount of the item to buy (type max to buy maximum amount)")),
         async execute(interaction) {
             let item = interaction.options.getString("item");
             let server = interaction.guild;
@@ -41,9 +41,11 @@ module.exports = {
 
                     let amount = 1;
                     if (interaction.options.getString("amount")) {
-                        amount = parseInt(interaction.options.getString("amount"));
+                        if (interaction.options.getString != "max") {
+                            amount = parseInt(interaction.options.getString("amount"));
+                        }
                     }
-                    if (amount === 0) { // Buy max
+                    if (interaction.options.getString("amount") === "max") { // Buy max
                         amount = Math.floor(bal / item_cost);
                         player_items[server.id][author.id][item] += amount;
                         bal_data[server.id][author.id] -= (amount * item_cost);

@@ -20,6 +20,13 @@ module.exports = {
                 fs.readFile('./data/player_item_data.json', (err2, data2) => {
                     if (err2) throw err2;
                     let player_items = JSON.parse(data2);
+
+                    // Check if player exists
+                    if (!(author.id in player_items)) {
+                        interaction.reply("You need to do `/start` first");
+                        return;
+                    }
+
                     let last_time = time_data[server.id][author.id];
                     let time = Math.floor( (Date.now() - last_time) / 1000); // in seconds
                     var income = 0;

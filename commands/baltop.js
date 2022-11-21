@@ -53,7 +53,7 @@ module.exports = {
                                     interaction.channel.send(`${person.displayName}: $${bal}`);
                                 });
                         }
-                        interaction.reply("Top balances for this server");
+                        interaction.reply("Top balances for this server: ");
 
                         bal_data = JSON.stringify(bal_data, null, 2);
                         fs.writeFileSync('./data/balance_data.json', bal_data);

@@ -22,7 +22,7 @@ module.exports = {
                     let player_items = JSON.parse(data2);
 
                     // Check if player exists
-                    if (!(author.id in player_items)) {
+                    if (!(author.id in player_items[server.id])) {
                         interaction.reply("You need to do `/start` first");
                         return;
                     }
@@ -45,7 +45,7 @@ module.exports = {
                         let bal_data = JSON.parse(data3);
                         bal_data[server.id][author.id] += income;
                         let bal = bal_data[server.id][author.id];
-                        interaction.reply(`Your balance is: ${bal}`);
+                        interaction.reply(`Your balance is: $${bal}`);
 
                         bal_data = JSON.stringify(bal_data, null, 2);
                         fs.writeFileSync('./data/balance_data.json', bal_data);

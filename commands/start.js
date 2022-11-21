@@ -14,7 +14,7 @@ module.exports = {
                 // Create new balance entry
                 let bal_data = JSON.parse(data1);
                 if (!(author.id in bal_data[server.id])) {
-                    bal_data[server.id][author.id] = 0;
+                    bal_data[server.id][author.id] = 10;
                 }
                 bal_data = JSON.stringify(bal_data, null, 2);
                 fs.writeFileSync('./data/balance_data.json', bal_data);

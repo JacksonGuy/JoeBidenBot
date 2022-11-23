@@ -7,13 +7,13 @@ module.exports = {
         .setDescription("Flip a coin to win or loose money")
         .addStringOption(option => 
             option
-                .setName("bet")
-                .setDescription("The amount of money to bet (type max to bet all your money)")
+                .setName("side")
+                .setDescription("Which side of the coin to bet on")
                 .setRequired(true))
         .addStringOption(option => 
             option
-                .setName("side")
-                .setDescription("Which side of the coin to bet on")
+                .setName("bet")
+                .setDescription("The amount of money to bet (type max to bet all your money)")
                 .setRequired(true)),
         async execute(interaction) {
             let server = interaction.guild;

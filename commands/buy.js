@@ -36,25 +36,39 @@ module.exports = {
                 fs.readFile('./data/player_item_data.json', (err2, data2) => {
                     if (err2) throw err2;
                     let player_items = JSON.parse(data2);
-                    let item_cost = item_data[item]["price"];
+                    let b_price = item_data[item]["price"];
                     let bal = bal_data[server.id][author.id];
+                    let scale = item_data[item]["scale"];
 
-                    let amount = 1;
+                    let p_amount = player_items[server.id][author.id][item];
+                    
+                    let amount = 1; // Default value
                     if (interaction.options.getString("amount")) {
                         if (interaction.options.getString != "max") {
                             amount = parseInt(interaction.options.getString("amount"));
                         }
                     }
                     if (interaction.options.getString("amount") === "max") { // Buy max
-                        amount = Math.floor(bal / item_cost);
-                        player_items[server.id][author.id][item] += amount;
-                        bal_data[server.id][author.id] -= (amount * item_cost);
+                        amount = 0;
+                        let item_cost = b_price + (b_price * p_amount * scale);
+                        while (item_cost <= bal) {
+                            player_items[server.id][author.id][item] += 1;
+                            bal_data[server.id][author.id] -= (b_price + (b_price * p_amount * scale));
+
+                            p_amount = player_items[server.id][author.id][item];
+                            item_cost = b_price + (b_price * p_amount * scale);
+                            bal = bal_data[server.id][author.id];
+
+                            amount++;
+                        }
                         interaction.reply(`${amount} ${item} purchased`);
                     }
                     else { // Buy amount
-                        if (amount * item_cost <= bal) {
+                        let item_cost = b_price + amount * (b_price * p_amount * scale);
+                        if (item_cost <= bal) {
                             player_items[server.id][author.id][item] += amount;
-                            bal_data[server.id][author.id] -= (amount * item_cost);
+                            bal_data[server.id][author.id] -= (item_cost);
+
                             interaction.reply(`${amount} ${item} purchased`);
                         }
                         else {

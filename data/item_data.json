@@ -1,14 +1,17 @@
 {
     "item 1" : {
         "price" : 10,
-        "income" : 1
+        "income" : 0.1,
+        "scale" : 0.1
     },
     "item 2" : {
         "price" : 100,
-        "income" : 10
+        "income" : 0.3,
+        "scale" : 0.2
     },
     "item 3" : {
         "price" : 1000,
-        "income" : 100
+        "income" : 0.5,
+        "scale" : 0.3
     }
 }

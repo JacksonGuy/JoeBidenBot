@@ -11,7 +11,7 @@ module.exports = {
             fs.readFile('./data/player_item_data.json', (err, data) => {
                 if (err) throw err;
                 let item_data = JSON.parse(data);
-                if (!(author.id in item_data)) {
+                if (!(author.id in item_data[server.id])) {
                     interaction.reply("You need to do `/start` first");
                     return;
                 }

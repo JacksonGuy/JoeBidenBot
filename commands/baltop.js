@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const fs = require("fs");
+const fs = require('fs');
+const tools = require('../tools');
 
 var item_data;
 fs.readFile("./data/item_data.json", (err, data) => {
@@ -7,6 +8,8 @@ fs.readFile("./data/item_data.json", (err, data) => {
     item_data = JSON.parse(data);
 });
 
+// Keeping this old code here just in case the new method stops working
+/*
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("baltop")
@@ -60,6 +63,50 @@ module.exports = {
                         time_data = JSON.stringify(time_data, null, 2);
                         fs.writeFileSync('./data/player_time_data.json', time_data);
                     });
+                });
+            });
+        }
+}
+*/
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName("baltop")
+        .setDescription("Shows the user's current balance"),
+        async execute(interaction) {
+            let server = interaction.guild;
+            tools.update_bal(server.id).then(() => {
+                fs.readFile('./data/balance_data.json', (err, data) => {
+                    if (err) throw err;
+                    bal_data = JSON.parse(data);
+    
+                    // Put all users from server into array
+                    let arr = [];
+                    for (let user in bal_data[server.id]) {
+                        arr.push(user);
+                    }
+
+                    // Bubble Sort array
+                    let n = arr.length;
+                    for (let i = 0; i < n; i++) {
+                        for (let j = 0; j < n-i-1; j++) {
+                            if (bal_data[server.id][arr[j]] > bal_data[server.id][arr[j+1]]) {
+                                let temp = arr[j];
+                                arr[j] = arr[j+1];
+                                arr[j+1] = temp;
+                            }
+                        }
+                    }
+
+                    // Display leaderboard
+                    for (let i = n-1; i >= 0; i--) {
+                        let bal = bal_data[server.id][arr[i]];
+                        interaction.guild.members.fetch(arr[i])
+                            .then((person) => {
+                                interaction.channel.send(`${person.displayName}: $${bal}`);
+                            });
+                    }
+                    interaction.reply("Top balances for this server: ");
                 });
             });
         }

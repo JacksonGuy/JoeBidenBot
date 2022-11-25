@@ -8,6 +8,7 @@ fs.readFile("./data/item_data.json", (err, data) => {
     item_data = JSON.parse(data);
 })
 
+// Keeping this old code here just in case the new method stops working
 /*
 module.exports = {
     data: new SlashCommandBuilder()
@@ -65,21 +66,21 @@ module.exports = {
         async execute(interaction) {
             let server = interaction.guild;
             let author = interaction.user;
-            await tools.update_bal(server.id, author.id);
-            fs.readFile('./data/balance_data.json', (err, data) => {
-                if (err) throw err;
-                bal_data = JSON.parse(data);
-
-                // Check if player exists
-                if (author.id in bal_data[server.id]) {
-                    bal = bal_data[server.id][author.id];
-                    interaction.reply(`Your balance is: $${bal}`);
-                }
-                else {
-                    interaction.reply("You need to do `/start` first");
-                    return;
-                }
-
+            tools.update_bal(server.id, author.id).then(() => {
+                fs.readFile('./data/balance_data.json', (err, data) => {
+                    if (err) throw err;
+                    bal_data = JSON.parse(data);
+    
+                    // Check if player exists
+                    if (author.id in bal_data[server.id]) {
+                        bal = bal_data[server.id][author.id];
+                        interaction.reply(`Your balance is: $${bal}`);
+                    }
+                    else {
+                        interaction.reply("You need to do `/start` first");
+                        return;
+                    }
+                });
             });
         }
 }

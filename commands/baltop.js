@@ -1,3 +1,4 @@
+const { EmbedBuilder } = require('@discordjs/builders');
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require('fs');
 const tools = require('../tools');
@@ -69,6 +70,24 @@ module.exports = {
 }
 */
 
+async function make_leaderboard(interaction, message, arr) {
+    let promise = new Promise( (resolve) => {
+        let n = arr.length;
+        let server = interaction.guild;
+        for (let i = n-1; i >= 0; i--) {
+            let bal = bal_data[server.id][arr[i]];
+            interaction.guild.members.fetch(arr[i])
+                .then((person) => {
+                    message.addFields(
+                        { name: `${person.displayName}`, value: `$${bal}`}
+                    );
+                });
+        }
+        resolve(1);
+    });
+    await promise;
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("baltop")
@@ -98,15 +117,17 @@ module.exports = {
                         }
                     }
 
-                    // Display leaderboard
-                    for (let i = n-1; i >= 0; i--) {
-                        let bal = bal_data[server.id][arr[i]];
-                        interaction.guild.members.fetch(arr[i])
-                            .then((person) => {
-                                interaction.channel.send(`${person.displayName}: $${bal}`);
-                            });
-                    }
-                    interaction.reply("Top balances for this server: ");
+                    var message = new EmbedBuilder()
+                        .setColor(0x00FF00)
+                        .setTitle("Leaderboard")
+                        .setAuthor({
+                            name: interaction.user.tag,
+                            iconURL: interaction.user.avatarURL()
+                        });
+
+                    make_leaderboard(interaction, message, arr).then(() => {
+                        interaction.reply({ embeds: [message] });
+                    });
                 });
             });
         }

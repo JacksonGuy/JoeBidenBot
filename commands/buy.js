@@ -26,7 +26,15 @@ module.exports = {
             let author = interaction.user;
 
             if (!(item in item_data)) {
-                await interaction.reply("Item doesn't exist");
+                const message = new EmbedBuilder()
+                    .setColor(0x00FF00)
+                    .setTitle("Error")
+                    .setDescription("That item does not exist")
+                    .setAuthor({
+                        name: interaction.user.tag,
+                        iconURL: interaction.user.avatarURL()
+                    });
+                await interaction.reply({ embeds: [message] });
                 return;
             }
 
@@ -61,7 +69,15 @@ module.exports = {
 
                             amount++;
                         }
-                        interaction.reply(`${amount} ${item} purchased`);
+                        const message = new EmbedBuilder()
+                            .setColor(0x00FF00)
+                            .setTitle("Purchased")
+                            .setDescription(`${amount} of ${item} bought`)
+                            .setAuthor({
+                                name: interaction.user.tag,
+                                iconURL: interaction.user.avatarURL()
+                            });
+                        interaction.reply({ embeds: [message] });
                     }
                     else { // Buy amount
                         let item_cost = b_price + amount * (b_price * p_amount * scale);
@@ -69,10 +85,26 @@ module.exports = {
                             player_items[server.id][author.id][item] += amount;
                             bal_data[server.id][author.id] -= (item_cost);
 
-                            interaction.reply(`${amount} ${item} purchased`);
+                            const message = new EmbedBuilder()
+                                .setColor(0x00FF00)
+                                .setTitle("Purchased")
+                                .setDescription(`${amount} of ${item} bought`)
+                                .setAuthor({
+                                    name: interaction.user.tag,
+                                    iconURL: interaction.user.avatarURL()
+                                });
+                            interaction.reply({ embeds: [message] });
                         }
                         else {
-                            interaction.reply("You can't afford that");
+                            const message = new EmbedBuilder()
+                            .setColor(0x00FF00)
+                            .setTitle("Error")
+                            .setDescription("You can't afford that")
+                            .setAuthor({
+                                name: interaction.user.tag,
+                                iconURL: interaction.user.avatarURL()
+                            });
+                        interaction.reply({ embeds: [message] });
                         }
                     }
                     bal_data = JSON.stringify(bal_data, null, 2);

@@ -24,9 +24,9 @@ module.exports = {
                     if (err) throw err;
                     player_items = JSON.parse(data);
                     player_items[server.id][author.id] = {
-                        "item 1": 0,
-                        "item 2": 0,
-                        "item 3": 0
+                        "Weed Plant": 0,
+                        "Weed Garden": 0,
+                        "Weed Farm": 0
                     }
                     player_items = JSON.stringify(player_items, null, 2);
                     fs.writeFileSync('./data/player_item_data.json', player_items);

@@ -1,3 +1,4 @@
+const { EmbedBuilder } = require('@discordjs/builders');
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require("fs");
 const tools = require("../tools");
@@ -74,11 +75,28 @@ module.exports = {
                     // Check if player exists
                     if (author.id in bal_data[server.id]) {
                         bal = bal_data[server.id][author.id];
-                        interaction.reply(`Your balance is: $${bal}`);
+
+                        const message = new EmbedBuilder()
+                            .setColor(0x00FF00)
+                            .setTitle("Balance")
+                            .setDescription(`$${bal}`)
+                            .setAuthor({
+                                name: interaction.user.tag,
+                                iconURL: interaction.user.avatarURL()
+                            });
+                        
+                        interaction.reply({ embeds: [message ]});
                     }
                     else {
-                        interaction.reply("You need to do `/start` first");
-                        return;
+                        const message = new EmbedBuilder()
+                            .setColor(0x00FF00)
+                            .setTitle("Error")
+                            .setDescription("You need to do `/start` first")
+                            .setAuthor({
+                                name: interaction.user.tag,
+                                iconURL: interaction.user.avatarURL()
+                            });
+                        interaction.reply({ embeds: [message] });
                     }
                 });
             });

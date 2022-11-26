@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require("fs");
 
 var item_data;
@@ -97,14 +97,14 @@ module.exports = {
                         }
                         else {
                             const message = new EmbedBuilder()
-                            .setColor(0x00FF00)
-                            .setTitle("Error")
-                            .setDescription("You can't afford that")
-                            .setAuthor({
-                                name: interaction.user.tag,
-                                iconURL: interaction.user.avatarURL()
-                            });
-                        interaction.reply({ embeds: [message] });
+                                .setColor(0x00FF00)
+                                .setTitle("Error")
+                                .setDescription("You can't afford that")
+                                .setAuthor({
+                                    name: interaction.user.tag,
+                                    iconURL: interaction.user.avatarURL()
+                                });
+                            interaction.reply({ embeds: [message] });
                         }
                     }
                     bal_data = JSON.stringify(bal_data, null, 2);

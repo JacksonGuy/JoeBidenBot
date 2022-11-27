@@ -69,14 +69,14 @@ module.exports = {
                 if (roll === 0) { // Heads
                     if (side === "heads") {
                         bal_data[server.id][author.id] += bet;
-                        message.addDescription("You won!");
+                        message.setDescription("You won!");
                         message.addFields(
                             { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
                         );
                     }
                     else {
                         bal_data[server.id][author.id] -= bet;
-                        message.addDescription("You lost!");
+                        message.setDescription("You lost!");
                         message.addFields(
                             { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
                         );
@@ -85,14 +85,14 @@ module.exports = {
                 else { // Tails
                     if (side === "tails") {
                         bal_data[server.id][author.id] += bet;
-                        message.addDescription("You won!");
+                        message.setDescription("You won!");
                         message.addFields(
                             { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
                         );
                     }
                     else {
                         bal_data[server.id][author.id] -= bet;
-                        message.addDescription("You lost!");
+                        message.setDescription("You lost!");
                         message.addFields(
                             { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
                         );

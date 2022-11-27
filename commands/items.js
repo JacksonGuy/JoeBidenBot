@@ -1,27 +1,40 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require("fs");
-
-var items;
-fs.readFile('./data/item_data.json', (err, data) => {
-    if (err) throw err;
-    items = JSON.parse(data);
-});
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("items")
-        .setDescription("Lists the items available to buy"),
+        .setDescription("Lists the user's items"),
         async execute(interaction) {
             let server = interaction.guild;
             let author = interaction.user;
             fs.readFile('./data/player_item_data.json', (err, data) => {
                 if (err) throw err;
-                player_items = JSON.parse(data);
-                for (let item in items) {
-                    price = items[item]["price"] + (items[item]["price"] * player_items[server.id][author.id][item] * items[item]["scale"]);
-                    interaction.channel.send(`${item}: $${price}`);
+                let item_data = JSON.parse(data);
+
+                var message = new EmbedBuilder()
+                    .setColor(0x00FF00)
+                    .setAuthor({
+                        name: author.tag,
+                        iconURL: author.avatarURL()
+                    });
+
+                if (!(author.id in item_data[server.id])) {
+                    message.setTitle("Error");
+                    message.setDescription("You need to do `/start` first");
+                    interaction.reply({ embeds: [message] });
+                    return;
+                }
+                else {
+                    message.setTitle("Items");
+                    message.setDescription("Your items");
+                    for (let item in item_data[server.id][author.id]) {
+                        message.addFields(
+                            { name: `${item}`, value: `${item_data[server.id][author.id][item]}`}
+                        );
+                    }
+                    interaction.reply({ embeds: [message] });
                 }
             });
-            await interaction.reply("Store: ");
         }
-    }
+}

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
@@ -22,11 +22,20 @@ module.exports = {
             let pick = interaction.options.getString("pick").toLowerCase();
             let bet = interaction.options.getString("bet");
 
+            var message = new EmbedBuilder()
+                .setColor(0x00FF00)
+                .setAuthor({
+                    name: author.tag,
+                    iconURL: author.avatarURL()
+                });
+
             let picks = ['red', 'black', 'even', 'odd', 'high', 'low'];
             if (!(picks.includes(pick))) { // User bet on number or invalid
-                pick = parseInt(pick);
+                pick = parseInt(pick); // TODO : check if input is an integer
                 if (!(pick >= 0 && pick <= 36)) {
-                    await interaction.reply("Invalid choice");
+                    message.setTitle("Error");
+                    message.setDescription("Invalid choice");
+                    await interaction.reply({ embeds: [message] });
                     return;
                 }
             }
@@ -40,7 +49,9 @@ module.exports = {
                 else {
                     bet = parseInt(bet);
                     if (bet > bal_data[server.id][author.id]) {
-                        interaction.reply("You don't have enough money");
+                        message.setTitle("Error");
+                        message.setDescription("You don't have enough money");
+                        interaction.reply({ embeds: [message] });
                         return;
                     }
                 }
@@ -84,11 +95,15 @@ module.exports = {
 
                 if (won) {
                     bal_data[server.id][author.id] += payout;
-                    interaction.reply(`You win! New balance: $${bal_data[server.id][author.id]}`);
+                    message.setTitle("You won!");
+                    message.setDescription(`New balance: $${bal_data[server.id][author.id]}`);
+                    interaction.reply({ embeds: [message] });
                 }
                 else {
                     bal_data[server.id][author.id] -= bet;
-                    interaction.reply(`You lose! New balance: $${bal_data[server.id][author.id]}`);
+                    message.setTitle("You lost!");
+                    message.setDescription(`New balance: $${bal_data[server.id][author.id]}`);
+                    interaction.reply({ embeds: [message] });
                 }
 
                 bal_data = JSON.stringify(bal_data, null, 2);

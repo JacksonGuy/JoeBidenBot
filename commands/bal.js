@@ -71,30 +71,26 @@ module.exports = {
                     if (err) throw err;
                     bal_data = JSON.parse(data);
     
+                    var message = new EmbedBuilder()
+                        .setColor(0x00FF00)
+                        .setAuthor({
+                            name: author.tag,
+                            iconURL: author.avatarURL()
+                        });
+
                     // Check if player exists
                     if (author.id in bal_data[server.id]) {
                         bal = bal_data[server.id][author.id];
 
-                        const message = new EmbedBuilder()
-                            .setColor(0x00FF00)
-                            .setTitle("Balance")
-                            .setDescription(`$${bal}`)
-                            .setAuthor({
-                                name: interaction.user.tag,
-                                iconURL: interaction.user.avatarURL()
-                            });
+                        message.setTitle("Balance");
+                        message.setDescription(`$${bal}`);
                         
                         interaction.reply({ embeds: [message ]});
                     }
                     else {
-                        const message = new EmbedBuilder()
-                            .setColor(0x00FF00)
-                            .setTitle("Error")
-                            .setDescription("You need to do `/start` first")
-                            .setAuthor({
-                                name: interaction.user.tag,
-                                iconURL: interaction.user.avatarURL()
-                            });
+                        message.setTitle("Error");
+                        message.setDescription("You need to do `/start` first");
+                        
                         interaction.reply({ embeds: [message] });
                     }
                 });

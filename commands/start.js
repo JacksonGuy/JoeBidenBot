@@ -41,7 +41,16 @@ module.exports = {
                     fs.writeFileSync('./data/player_time_data.json', time_data);
                 });
 
-                interaction.reply("Player Created");
+                const message = new EmbedBuilder()
+                    .setColor(0x00FF00)
+                    .setAuthor({
+                        name: interaction.user.tag,
+                        iconURL: interaction.user.avatarURL()
+                    })
+                    .setTitle("Player created")
+                    .setDescription("Have fun ruining your life!");
+
+                interaction.reply({ embeds: [message] });
             })
         }
 }

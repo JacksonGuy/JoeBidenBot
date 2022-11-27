@@ -11,17 +11,17 @@ fs.readFile('./data/item_data.json', (err, data) => {
 // Please update in the future (?)
 async function update_bal(server, author=null) {
     let promise = new Promise( (resolve) => {
-        fs.readFile('./data/balance_data.json', (err, data) => {
+        fs.readFile('./data/balance_data.json', (err, data1) => {
             if (err) throw err;
-            let bal_data = JSON.parse(data);
+            let bal_data = JSON.parse(data1);
             
-            fs.readFile('./data/player_item_data.json', (err, data) => {
+            fs.readFile('./data/player_item_data.json', (err, data2) => {
                 if (err) throw err;
-                player_items = JSON.parse(data);
+                player_items = JSON.parse(data2);
     
-                fs.readFile('./data/player_time_data.json', (err, data) => {
+                fs.readFile('./data/player_time_data.json', (err, data3) => {
                     if (err) throw err;
-                    time_data = JSON.parse(data);
+                    time_data = JSON.parse(data3);
                     if (author !== null) { // Update single balance
                         if (!(author in bal_data[server])) {
                             return;

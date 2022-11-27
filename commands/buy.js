@@ -54,6 +54,7 @@ module.exports = {
                     if (interaction.options.getString("amount")) {
                         if (interaction.options.getString != "max") {
                             amount = parseInt(interaction.options.getString("amount"));
+                            console.log(amount);
                         }
                     }
                     if (interaction.options.getString("amount") === "max") { // Buy max

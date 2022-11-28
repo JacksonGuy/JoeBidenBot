@@ -7,7 +7,7 @@ fs.readFile('./data/item_data.json', (err, data) => {
 });
 
 async function update_bal(server_id, author_id=null) {
-    let promise = new Promise((resolve) => {
+    let promise = new Promise(resolve => {
         fs.readFile('./data/' + server_id + '.json', (err, data) => {
             if (err) {
                 resolve(false);
@@ -46,6 +46,7 @@ async function update_bal(server_id, author_id=null) {
                 income = Math.floor(income);
 
                 player_data[author_id]['bal'] += income;
+                player_data[author_id]['time'] = Date.now();
             }
 
             // Write data to file
@@ -58,7 +59,7 @@ async function update_bal(server_id, author_id=null) {
 }
 
 async function check_server_exists(server_id) {
-    let promise = new Promise((resolve) => {
+    let promise = new Promise(resolve => {
         fs.readdir('./data/', (err, files) => {
             if (err) throw err;
             let fileName = server_id + '.json';

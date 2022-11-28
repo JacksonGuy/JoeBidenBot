@@ -23,29 +23,38 @@ module.exports = {
                 }
             }
 
-            await tools.check_server_exists().then(result => {
-                if (!result) {
-                    fs.writeFileSync(fileName, JSON.stringify({}));
-                }
-            });
-
-            fs.readFile(fileName, (err, data) => {
-                if (err) throw err;
-                let file = Array.from(JSON.parse(data));
-                file.push(user);
-                file = JSON.stringify(file[0], null, 2);
-                fs.writeFileSync(fileName, file);
-            });
-
-            const message = new EmbedBuilder()
+            var message = new EmbedBuilder()
                 .setColor(0x00FF00)
                 .setAuthor({
                     name: interaction.user.tag,
                     iconURL: interaction.user.avatarURL()
-                })
-                .setTitle("Player created")
-                .setDescription("Have fun ruining your life!");
+                });
 
-            interaction.reply({ embeds: [message] });
+            await tools.check_server_exists(server.id).then(result => {
+                if (!result) {
+                    fs.writeFileSync(fileName, JSON.stringify({}));
+                }
+
+                fs.readFile(fileName, (err, data) => {
+                    if (err) throw err;
+                    player_data = JSON.parse(data)
+
+                    if (author.id in player_data) {
+                        message.setTitle("Error");
+                        message.setDescription("You already have an account");
+                        interaction.reply({ embeds: [message] });
+                        return;
+                    }
+
+                    let file = Array.from(player_data);
+                    file.push(user);
+                    file = JSON.stringify(file[0], null, 2);
+                    fs.writeFileSync(fileName, file);
+
+                    message.setTitle("Player created");
+                    message.setDescription("Have fun ruining your life!");
+                    interaction.reply({ embeds: [message] });
+                });
+            });
         }
 }

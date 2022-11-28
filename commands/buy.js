@@ -35,7 +35,7 @@ module.exports = {
 
             if (!(item in item_data)) {
                 message.setTitle("Error");
-                message.setDescription("That item does not exist");
+                message.setDescription("Item does not exist: " + item);
                 await interaction.reply({ embeds: [message] });
                 return;
             }

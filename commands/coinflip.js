@@ -1,5 +1,6 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, Embed } = require('discord.js');
 const fs = require('fs');
+const tools = require('../tools');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -22,87 +23,98 @@ module.exports = {
             let bet = interaction.options.getString("bet");
             let side = interaction.options.getString("side").toLowerCase();
 
+            var message = new EmbedBuilder()
+                .setColor(0x00FF00)
+                .setAuthor({
+                    name: author.tag,
+                    iconURL: author.avatarURL()
+                });
+
             if (side != "heads" && side != "tails") {
-                const message = new EmbedBuilder()
-                    .setColor(0x00FF00)
-                    .setTitle("Error")
-                    .setDescription("Invalid side")
-                    .setAuthor({
-                        name: interaction.user.tag,
-                        iconURL: interaction.user.avatarURL()
-                    });
+                message.setTitle("Error");
+                message.setDescription("Invalid side");
                 interaction.reply({ embeds: [message] });
                 return;
             }
 
-            fs.readFile('./data/balance_data.json', (err, data) => {
-                if (err) throw err;
-                let bal_data = JSON.parse(data);
-                if (bet === "max") {
-                    bet = bal_data[server.id][author.id];
+            await tools.update_bal(server.id, author.id).then(result => {
+                if (!result) {
+                    message.setTitle("Error");
+                    message.setDescription("You need to do `/start` first");
+                    interaction.reply({ embeds: [message] });
+                    return;
                 }
-                else {
-                    bet = parseInt(bet);
-                    if (bet > bal_data[server.id][author.id]) {
-                        const message = new EmbedBuilder()
-                            .setColor(0x00FF00)
-                            .setTitle("Error")
-                            .setDescription("You don't have enough money")
-                            .setAuthor({
-                                name: interaction.user.tag,
-                                iconURL: interaction.user.avatarURL()
-                            });
+                fs.readFile('./data/' + server.id + '.json', (err, data) => {
+                    if (err) throw err;
+                    player_data = JSON.parse(data);
+
+                    if (!(author.id in player_data)) {
+                        message.setTitle("Error");
+                        message.setDescription("You need to do `/start` first");
                         interaction.reply({ embeds: [message] });
                         return;
                     }
-                }
-                
-                const message = new EmbedBuilder()
-                    .setColor(0x00FF00)
-                    .setTitle("Coin flip")
-                    .setAuthor({
-                        name: interaction.user.tag,
-                        iconURL: interaction.user.avatarURL()
-                    });
 
-                let roll = Math.floor(Math.random() * 2); 
-                if (roll === 0) { // Heads
-                    if (side === "heads") {
-                        bal_data[server.id][author.id] += bet;
-                        message.setDescription("You won!");
-                        message.addFields(
-                            { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
-                        );
+                    if (bet === "max") {
+                        bet = player_data[author.id]['bal'];
                     }
                     else {
-                        bal_data[server.id][author.id] -= bet;
-                        message.setDescription("You lost!");
-                        message.addFields(
-                            { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
-                        );
+                        if (!(isNaN(parseInt(bet)))) {
+                            bet = parseInt(bet);
+                            if (bet > player_data[author.id]['bal']) {
+                                message.setTitle("Error");
+                                message.setDescription("You don't have enough money");
+                                interaction.reply({ embeds: [message] });
+                                return;
+                            }
+                        }
+                        else {
+                            message.setTitle("Error");
+                            message.setDescription("Invalid bet amount: " + bet);
+                            interaction.reply({ embeds: [message] });
+                            return;
+                        }
                     }
-                }
-                else { // Tails
-                    if (side === "tails") {
-                        bal_data[server.id][author.id] += bet;
-                        message.setDescription("You won!");
-                        message.addFields(
-                            { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
-                        );
-                    }
-                    else {
-                        bal_data[server.id][author.id] -= bet;
-                        message.setDescription("You lost!");
-                        message.addFields(
-                            { name: "New balance:", value: `$${bal_data[server.id][author.id]}`}
-                        );
-                    }
-                }
 
-                interaction.reply({ embeds: [message] });
+                    message.setTitle("Coin flip");
+                    let roll = Math.floor(Math.random() * 2);
+                    if (roll === 0) { // Heads
+                        if (side === "heads") {
+                            player_data[author.id]['bal'] += bet;
+                            message.setDescription("You won!");
+                            message.addFields(
+                                { name: "New balance:", value: `$${player_data[author.id]['bal']}`}
+                            );
+                        }
+                        else {
+                            player_data[author.id]['bal'] -= bet;
+                            message.setDescription("You lost!");
+                            message.addFields(
+                                { name: "New balance:", value: `$${player_data[author.id]['bal']}`}
+                            );
+                        }
+                    }
+                    else { // Tails
+                        if (side === "tails") {
+                            player_data[author.id]['bal'] += bet;
+                            message.setDescription("You won!");
+                            message.addFields(
+                                { name: "New balance:", value: `$${player_data[author.id]['bal']}`}
+                            );
+                        }
+                        else {
+                            player_data[author.id]['bal'] -= bet;
+                            message.setDescription("You lost!");
+                            message.addFields(
+                                { name: "New balance:", value: `$${player_data[author.id]['bal']}`}
+                            );
+                        }
+                    }
 
-                bal_data = JSON.stringify(bal_data, null, 2);
-                fs.writeFileSync('./data/balance_data.json', bal_data);
+                    player_data = JSON.stringify(player_data, null, 2);
+                    fs.writeFileSync('./data/' + server.id + '.json', player_data);
+                    interaction.reply({ embeds: [message] });
+                });
             });
         }
 }

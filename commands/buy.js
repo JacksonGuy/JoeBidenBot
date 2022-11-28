@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require("fs");
+const tools = require("../tools");
 
 var item_data;
 fs.readFile('./data/item_data.json', (err, data) => {
@@ -14,7 +15,7 @@ module.exports = {
         .addStringOption(option => 
             option
                 .setName("item")
-                .setDescription("The item to buy")
+                .setDescription("The item to buy (case sensitive!)")
                 .setRequired(true))
         .addStringOption(option =>
             option
@@ -25,93 +26,98 @@ module.exports = {
             let server = interaction.guild;
             let author = interaction.user;
 
+            var message = new EmbedBuilder()
+                .setColor(0x00FF00)
+                .setAuthor({
+                    name: author.tag,
+                    iconURL: author.avatarURL()
+                });
+
             if (!(item in item_data)) {
-                const message = new EmbedBuilder()
-                    .setColor(0x00FF00)
-                    .setTitle("Error")
-                    .setDescription("That item does not exist")
-                    .setAuthor({
-                        name: interaction.user.tag,
-                        iconURL: interaction.user.avatarURL()
-                    });
+                message.setTitle("Error");
+                message.setDescription("That item does not exist");
                 await interaction.reply({ embeds: [message] });
                 return;
             }
 
-            fs.readFile('./data/balance_data.json', (err1, data1) => {
-                if (err1) throw err1;
-                let bal_data = JSON.parse(data1);
-                fs.readFile('./data/player_item_data.json', (err2, data2) => {
-                    if (err2) throw err2;
-                    let player_items = JSON.parse(data2);
-                    let b_price = item_data[item]["price"];
-                    let bal = bal_data[server.id][author.id];
-                    let scale = item_data[item]["scale"];
+            await tools.update_bal(server.id, author.id).then(result => {
+                if (!result) {
+                    message.setTitle("Error");
+                    message.setDescription("You need to do `/start` first");
+                    interaction.reply({ embeds: [message] });
+                    return;
+                }
+                fs.readFile('./data/' + server.id + '.json', (err, data) => {
+                    if (err) throw err;
+                    player_data = JSON.parse(data);
 
-                    let p_amount = player_items[server.id][author.id][item];
-                    
-                    let amount = 1; // Default value
-                    if (interaction.options.getString("amount")) {
-                        if (interaction.options.getString != "max") {
-                            amount = parseInt(interaction.options.getString("amount"));
-                            console.log(amount);
+                    if (author.id in player_data) {
+                        let base_price = item_data[item]["price"];
+                        let item_scale = item_data[item]["scale"];
+                        let bal = player_data[author.id]["bal"];
+                        let player_item_amount = player_data[author.id]["items"][item];
+
+                        let amount = 1; // Default buy amount
+                        let amountOption = interaction.options.getString("amount");
+                        // User specified an amount to buy
+                        if (amountOption) {
+                            if (amountOption !== "max") {
+                                if (!(isNaN(parseInt(amountOption)))) {
+                                    amount = parseInt(amountOption);
+                                }
+                                else {
+                                    message.setTitle("Error");
+                                    message.setDescription("Invalid amount");
+                                    interaction.reply({ embeds: [message] });
+                                    return;
+                                }
+                            }
                         }
-                    }
-                    if (interaction.options.getString("amount") === "max") { // Buy max
-                        amount = 0;
-                        let item_cost = b_price + (b_price * p_amount * scale);
-                        while (item_cost <= bal) {
-                            player_items[server.id][author.id][item] += 1;
-                            bal_data[server.id][author.id] -= (b_price + (b_price * p_amount * scale));
 
-                            p_amount = player_items[server.id][author.id][item];
-                            item_cost = b_price + (b_price * p_amount * scale);
-                            bal = bal_data[server.id][author.id];
+                        // Buy maximum amount of the item
+                        if (amountOption === "max") {
+                            amount = 0;
+                            let buy_cost = base_price + (base_price * player_item_amount * item_scale);
+                            while (buy_cost <= bal) {
+                                player_data[author.id]["items"][item] += 1;
+                                player_data[author.id]["bal"] -= buy_cost;
 
-                            amount++;
+                                // Update variables
+                                player_item_amount++;
+                                buy_cost = base_price + (base_price * player_item_amount * item_scale);
+                                bal = player_data[author.id]["bal"];
+                                amount++;
+                            }
                         }
-                        const message = new EmbedBuilder()
-                            .setColor(0x00FF00)
-                            .setTitle("Purchased")
-                            .setDescription(`${amount} of ${item} bought`)
-                            .setAuthor({
-                                name: interaction.user.tag,
-                                iconURL: interaction.user.avatarURL()
-                            });
-                        interaction.reply({ embeds: [message] });
-                    }
-                    else { // Buy amount
-                        let item_cost = b_price + amount * (b_price * p_amount * scale);
-                        if (item_cost <= bal) {
-                            player_items[server.id][author.id][item] += amount;
-                            bal_data[server.id][author.id] -= (item_cost);
-
-                            const message = new EmbedBuilder()
-                                .setColor(0x00FF00)
-                                .setTitle("Purchased")
-                                .setDescription(`${amount} of ${item} bought`)
-                                .setAuthor({
-                                    name: interaction.user.tag,
-                                    iconURL: interaction.user.avatarURL()
-                                });
-                            interaction.reply({ embeds: [message] });
-                        }
+                        // Buy a specific amount
                         else {
-                            const message = new EmbedBuilder()
-                                .setColor(0x00FF00)
-                                .setTitle("Error")
-                                .setDescription("You can't afford that")
-                                .setAuthor({
-                                    name: interaction.user.tag,
-                                    iconURL: interaction.user.avatarURL()
-                                });
-                            interaction.reply({ embeds: [message] });
+                            let buy_cost = base_price + (base_price * player_item_amount * item_scale);
+                            if (buy_cost <= bal) {
+                                player_data[author.id]["items"][item] += 1;
+                                player_data[author.id]["bal"] -= buy_cost;
+                            }
+                            else {
+                                message.setTitle("Error");
+                                message.setDescription("You can't afford that");
+                                interaction.reply({ embeds: [message] });
+                                return;
+                            }
                         }
+
+                        message.setTitle("Purchase successful");
+                        message.setDescription(`You bought ${amount} of ${item}`);
+                        interaction.reply({ embeds: [message] });
+
+                        player_data = JSON.stringify(player_data, null, 2);
+                        fs.writeFileSync('./data/' + server.id + '.json', player_data);
                     }
-                    bal_data = JSON.stringify(bal_data, null, 2);
-                    fs.writeFileSync('./data/balance_data.json', bal_data)
-                    player_items = JSON.stringify(player_items, null, 2);
-                    fs.writeFileSync('./data/player_item_data.json', player_items);
+                    else {
+                        message.setTitle("Error");
+                        message.setDescription("You need to do `/start` first");
+                        
+                        interaction.reply({ embeds: [message] });
+                        return;
+                    }
                 });
             });
         }

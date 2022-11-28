@@ -16,32 +16,23 @@ module.exports = {
             let server = interaction.guild;
             let author = interaction.user;
 
-            // Check if server file exists first
-            /*
-            fs.readdir('./data/', (err, data) => {
-                if (err) throw err;
-                let server_file = server.id + '.json';
-                if (!(data.includes(server_file))) {
-                    interaction.reply("You need to do `/start` first");
+            var message = new EmbedBuilder()
+                .setColor(0x00FF00)
+                .setAuthor({
+                    name: author.tag,
+                    iconURL: author.avatarURL()
+                });
+
+            await tools.update_bal(server.id, author.id).then((result) => {
+                if (!result) {
+                    message.setTitle("Error");
+                    message.setDescription("You need to do `/start` first");
+                    interaction.reply({ embeds: [message] });
                     return;
                 }
-            });
-            */
-
-            tools.update_bal(server.id, author.id).then(() => {
                 fs.readFile('./data/' + server.id + '.json', (err, data) => {
-                    if (err) {
-                        interaction.reply("You need to do `/start` first");
-                        return;
-                    }
+                    if (err) throw err;
                     player_data = JSON.parse(data);
-    
-                    var message = new EmbedBuilder()
-                        .setColor(0x00FF00)
-                        .setAuthor({
-                            name: author.tag,
-                            iconURL: author.avatarURL()
-                        });
 
                     // Check if player exists
                     if (author.id in player_data) {

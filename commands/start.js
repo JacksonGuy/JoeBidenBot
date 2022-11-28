@@ -1,5 +1,6 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require("fs");
+const tools = require('../tools');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,38 +9,32 @@ module.exports = {
         async execute(interaction) {
             let server = interaction.guild;
             let author = interaction.user;
-            fs.readFile('./data/balance_data.json', (err, data) => {
-                if (err) throw err;
-
-                // Create new balance entry
-                let bal_data = JSON.parse(data);
-                if (!(author.id in bal_data[server.id])) {
-                    bal_data[server.id][author.id] = 10;
-                }
-                bal_data = JSON.stringify(bal_data, null, 2);
-                fs.writeFileSync('./data/balance_data.json', bal_data);
-            });
+            let fileName = './data/' + server.id + '.json'; 
             
-            // Create new items entry
-            fs.readFile('./data/player_item_data.json', (err, data) => {
-                if (err) throw err;
-                player_items = JSON.parse(data);
-                player_items[server.id][author.id] = {
-                    "Weed Plant": 0,
-                    "Weed Garden": 0,
-                    "Weed Farm": 0
+            user = {
+                [author.id]: {
+                    "bal": 10,
+                    "time": Date.now(),
+                    "items": {
+                        "Weed Plant": 0,
+                        "Weed Garden": 0,
+                        "Weed Farm": 0
+                    }
                 }
-                player_items = JSON.stringify(player_items, null, 2);
-                fs.writeFileSync('./data/player_item_data.json', player_items);
+            }
+
+            await tools.check_server_exists().then(result => {
+                if (!result) {
+                    fs.writeFileSync(fileName, JSON.stringify({}));
+                }
             });
 
-                // Create new time entry
-            fs.readFile('./data/player_time_data.json', (err, data) => {
+            fs.readFile(fileName, (err, data) => {
                 if (err) throw err;
-                time_data = JSON.parse(data);
-                time_data[server.id][author.id] = Date.now();
-                time_data = JSON.stringify(time_data, null, 2);
-                fs.writeFileSync('./data/player_time_data.json', time_data);
+                let file = Array.from(JSON.parse(data));
+                file.push(user);
+                file = JSON.stringify(file[0], null, 2);
+                fs.writeFileSync(fileName, file);
             });
 
             const message = new EmbedBuilder()

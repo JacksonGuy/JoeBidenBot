@@ -15,10 +15,26 @@ module.exports = {
         async execute(interaction) {
             let server = interaction.guild;
             let author = interaction.user;
+
+            // Check if server file exists first
+            /*
+            fs.readdir('./data/', (err, data) => {
+                if (err) throw err;
+                let server_file = server.id + '.json';
+                if (!(data.includes(server_file))) {
+                    interaction.reply("You need to do `/start` first");
+                    return;
+                }
+            });
+            */
+
             tools.update_bal(server.id, author.id).then(() => {
-                fs.readFile('./data/balance_data.json', (err, data) => {
-                    if (err) throw err;
-                    bal_data = JSON.parse(data);
+                fs.readFile('./data/' + server.id + '.json', (err, data) => {
+                    if (err) {
+                        interaction.reply("You need to do `/start` first");
+                        return;
+                    }
+                    player_data = JSON.parse(data);
     
                     var message = new EmbedBuilder()
                         .setColor(0x00FF00)
@@ -28,8 +44,8 @@ module.exports = {
                         });
 
                     // Check if player exists
-                    if (author.id in bal_data[server.id]) {
-                        bal = bal_data[server.id][author.id];
+                    if (author.id in player_data) {
+                        bal = player_data[author.id]["bal"];
 
                         message.setTitle("Balance");
                         message.setDescription(`$${bal}`);

@@ -1,0 +1,17 @@
+{
+    "Weed Plant" : {
+        "price" : 10,
+        "income" : 0.1,
+        "scale" : 0.5
+    },
+    "Weed Garden" : {
+        "price" : 100,
+        "income" : 0.3,
+        "scale" : 0.6
+    },
+    "Weed Farm" : {
+        "price" : 1000,
+        "income" : 0.5,
+        "scale" : 0.7
+    }
+}

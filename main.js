@@ -1,8 +1,9 @@
-const { Client, GatewayIntentBits, Collection, Events } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, Events, ActivityType } = require('discord.js');
 const { token } = require("./config.json");
 const fs = require('node:fs');
 const path = require('node:path');
 
+//const tools = require("./tools.js");
 
 const client = new Client({ intents: [
 	GatewayIntentBits.Guilds,
@@ -27,7 +28,7 @@ for (const file of commandFiles) {
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
-    client.user.setActivity('im back losers', { type: 'PLAYING' });
+    client.user.setActivity("im back losers", { type: ActivityType.Playing} );
 });
 
 client.on(Events.InteractionCreate, async interaction => {

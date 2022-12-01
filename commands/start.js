@@ -19,6 +19,16 @@ module.exports = {
                         "Weed Plant": 0,
                         "Weed Garden": 0,
                         "Weed Farm": 0
+                    },
+                    "stats": {
+                        "coinflip": {
+                            "played": 0,
+                            "won": 0
+                        },
+                        "roulette": {
+                            "played": 0,
+                            "won": 0
+                        }
                     }
                 }
             }

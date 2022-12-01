@@ -2,12 +2,6 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const tools = require('../tools');
 
-var item_data;
-fs.readFile("./data/item_data.json", (err, data) => {
-    if (err) throw err;
-    item_data = JSON.parse(data);
-});
-
 async function make_leaderboard(interaction, message, arr) {
     let promise = new Promise( (resolve) => {
         let n = arr.length;

@@ -22,11 +22,11 @@ module.exports = {
                     },
                     "stats": {
                         "coinflip": {
-                            "played": 0,
+                            "total": 0,
                             "won": 0
                         },
                         "roulette": {
-                            "played": 0,
+                            "total": 0,
                             "won": 0
                         }
                     }

@@ -127,6 +127,7 @@ module.exports = {
     
                     if (won) {
                         player_data[author.id]['bal'] += payout;
+                        player_data[author.id]['stats']['coinflip']['won'] += 1;
                         message.setTitle("You won!");
                         message.setDescription(`New balance: $${player_data[author.id]['bal']}`);
                         interaction.reply({ embeds: [message] });
@@ -137,6 +138,8 @@ module.exports = {
                         message.setDescription(`New balance: $${player_data[author.id]['bal']}`);
                         interaction.reply({ embeds: [message] });
                     }
+
+                    player_data[author.id]['stats']['coinflip']['total'] += 1;
     
                     player_data = JSON.stringify(player_data, null, 2);
                     fs.writeFileSync('./data/' + server.id + '.json', player_data);

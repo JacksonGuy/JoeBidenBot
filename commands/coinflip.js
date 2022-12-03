@@ -81,6 +81,7 @@ module.exports = {
                     if (roll === 0) { // Heads
                         if (side === "heads") {
                             player_data[author.id]['bal'] += bet;
+                            player_data[author.id]['stats']['coinflip']['won'] += 1;
                             message.setDescription("You won!");
                             message.addFields(
                                 { name: "New balance:", value: `$${player_data[author.id]['bal']}`}
@@ -97,6 +98,7 @@ module.exports = {
                     else { // Tails
                         if (side === "tails") {
                             player_data[author.id]['bal'] += bet;
+                            player_data[author.id]['stats']['coinflip']['won'] += 1;
                             message.setDescription("You won!");
                             message.addFields(
                                 { name: "New balance:", value: `$${player_data[author.id]['bal']}`}
@@ -110,6 +112,8 @@ module.exports = {
                             );
                         }
                     }
+
+                    player_data[author.id]['stats']['coinflip']['total'] += 1;
 
                     player_data = JSON.stringify(player_data, null, 2);
                     fs.writeFileSync('./data/' + server.id + '.json', player_data);

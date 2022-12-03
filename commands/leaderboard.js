@@ -3,17 +3,17 @@ const fs = require('fs');
 const { PassThrough } = require('stream');
 const tools = require('../tools');
 
-var user_array = [];
+var player_data;
 
 async function make_leaderboard(interaction, message, arr) {
     let promise = new Promise(resolve => {
         let game = interaction.options.getString("game").toLowerCase();
         for (let i = 0; i < arr.length; i++) {
-            //let wins = player_data[arr[i]]['stats'][game]['won'];
-            let wins = arr[i]['stats'][game]['won'];
-            interaction.guild.members.fetch(arr[i]).then(person => {
+            let wins = arr[i][1]['stats'][game]['won'];
+            let total = arr[i][1]['stats'][game]['total'];
+            interaction.guild.members.fetch(arr[i][0]).then(person => {
                 message.addFields(
-                    { name: person.displayName, value: wins}
+                    { name: `${person.displayName}`, value: `${wins} (${Math.floor((wins/total)*100)}% winrate)` }
                 );
             });
         }
@@ -66,28 +66,31 @@ module.exports = {
                     if (err) throw err;
                     player_data = JSON.parse(data);
 
+                    let user_array = {
+                        "coinflip": [],
+                        "roulette": []
+                    };
+
                     // Put new users into arr
                     for (let user in player_data) {
-                        if (!user_array.includes(user)) {
-                            user_array.push(user);
-                        }
+                        user_array[game].push([user,player_data[user]]);
                     }
 
                     // Insertion sort array
                     let n = user_array.length;
                     for (let i = 1; i < n; i++) {
-                        let next = user_array[i];
+                        let next = user_array[game][i];
                         let j = i;
-                        while (j > 0 && user_array[j-1]['stats'][game]['won'] > next['stats'][game]['won']) {
-                            user_array[j] = user_array[j-1];
+                        while (j > 0 && user_array[game][j-1][1]["stats"][game]["won"] > next[1]["stats"][game]["won"]) {
+                            user_array[game][j] = user_array[game][j-1];
                             j--;
                         }
-                        user_array[j] = next;
+                        user_array[game][j] = next;
                     }
 
-                    message.setTitle("Leaderboard");
+                    message.setTitle("Leaderboard: " + game);
 
-                    make_leaderboard(interaction, message, user_array).then(() => {
+                    make_leaderboard(interaction, message, user_array[game]).then(() => {
                         interaction.reply({ embeds: [message] });
                     });
                 });

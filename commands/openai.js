@@ -24,7 +24,7 @@ async function process_prompt(prompt) {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("openai")
-        .setDescription("Input a prompt and get a response generated using OpenAI's Davinci-002 model")
+        .setDescription("Input a prompt and get a response generated using OpenAI's Davinci-003 model")
         .addStringOption(option => 
             option
                 .setName("prompt")

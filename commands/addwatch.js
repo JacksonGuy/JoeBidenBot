@@ -10,12 +10,22 @@ module.exports = {
             option
                 .setName("media")
                 .setDescription("The movie/show to add")
-                .setRequired(true)),
+                .setRequired(true))
+        .addStringOption(option => 
+            option
+                .setName("list")
+                .setDescription("List to add the media to")
+                .setRequired(false)),
         async execute(interaction) {
             let server = interaction.guild;
             let author = interaction.user;
             let filename = './data/' + server.id + '.json';
             let media = interaction.options.getString("media");
+
+            let list = "default";
+            if (interaction.options.getString("list")) {
+                list = interaction.options.getString("list");
+            }
 
             var message = new EmbedBuilder()
                 .setColor(0x00FF00)
@@ -32,13 +42,13 @@ module.exports = {
                 fs.readFile(filename, (err, data) => {
                     if (err) throw err;
                     server_data = JSON.parse(data);
-                    
+
                     if ('watch_list' in server_data) {
-                        server_data['watch_list'].push(media);
+                        server_data['watch_list'][list].push(media);
                     }
                     else {
-                        server_data['watch_list'] = [];
-                        server_data['watch_list'].push(media);
+                        server_data['watch_list'][list] = [];
+                        server_data['watch_list'][list].push(media);
                     }
 
                     message.setTitle("Successfully added");

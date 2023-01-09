@@ -10,12 +10,22 @@ module.exports = {
             option
                 .setName("media")
                 .setDescription("The movie/show to remove")
-                .setRequired(true)),
+                .setRequired(true))
+        .addStringOption(option =>
+            option
+                .setName("list")
+                .setDescription("List to remove from")
+                .setRequired(false)),
         async execute(interaction) {
             let server = interaction.guild;
             let author = interaction.user;
             let filename = './data/' + server.id + '.json';
             let media = interaction.options.getString("media");
+
+            let list = "default";
+            if (interaction.options.getString("list")) {
+                list = interaction.options.getString("list");
+            }
 
             var message = new EmbedBuilder()
                 .setColor(0x00FF00)
@@ -37,9 +47,9 @@ module.exports = {
                     server_data = JSON.parse(data);
                     
                     if ('watch_list' in server_data) {
-                        let index = server_data['watch_list'].indexOf(media);
+                        let index = server_data['watch_list'][list].indexOf(media);
                         if (index > -1) { 
-                            server_data['watch_list'].splice(index, 1);
+                            server_data['watch_list'][list].splice(index, 1);
                         }
                         else {
                             message.setTitle("Error");

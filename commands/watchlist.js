@@ -5,11 +5,21 @@ const tools = require('../tools');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("watchlist")
-        .setDescription("Shows your server's watch list"),
+        .setDescription("Shows your server's watch list")
+        .addStringOption(option =>
+            option
+                .setName("list")
+                .setDescription("List to show")
+                .setRequired(false)),
         async execute(interaction) {
             let server = interaction.guild;
             let author = interaction.user;
             let filename = './data/' + server.id + '.json';
+
+            let list = "default";
+            if (interaction.options.getString('list')) {
+                list = interaction.options.getString('list');
+            }
 
             var message = new EmbedBuilder()
                 .setColor(0x00FF00)
@@ -30,13 +40,13 @@ module.exports = {
                     if (err) throw err;
                     server_data = JSON.parse(data);
                     
-                    let list = "";
+                    let listContent = "";
                     if ('watch_list' in server_data) {
                         message.setTitle("Watch List");
-                        for (item in server_data['watch_list']) {
-                            list = list + ` ${server_data['watch_list'][item]}\n`;
+                        for (item in server_data['watch_list'][list]) {
+                            listContent = listContent + ` ${server_data['watch_list'][list][item]}\n`;
                         }
-                        message.setDescription(list);
+                        message.setDescription(listContent);
                         interaction.reply({ embeds: [message] });
                         return;
                     }

@@ -43,12 +43,12 @@ module.exports = {
                     if (err) throw err;
                     server_data = JSON.parse(data);
 
-                    if ('watch_list' in server_data) {
+                    if (server_data['watch_list'][list]) {
                         server_data['watch_list'][list].push(media);
                     }
                     else {
                         server_data['watch_list'][list] = [];
-                        server_data['watch_list'][list].push(media);
+                        server_data['watch_list'][list].push(media); 
                     }
 
                     message.setTitle("Successfully added");

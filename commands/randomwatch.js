@@ -17,8 +17,8 @@ module.exports = {
             let filename = './data/' + server.id + '.json';
 
             let list = "default";
-            if (interaction.options.getString("title")) {
-                list = interaction.options.getString("title");
+            if (interaction.options.getString("list")) {
+                list = interaction.options.getString("list");
             }
 
             var message = new EmbedBuilder()

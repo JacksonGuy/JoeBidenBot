@@ -25,15 +25,17 @@ module.exports = {
             if (interaction.options.getString("option") === "start") {
                 interaction.reply("Started tracking");
                 setInterval(function() {
-                    if (tyler.presence.activities[0].name === "World of Warcraft") {
-                        fs.readFile(filename, (err, data) => {
-                            if (err) throw err;
-                            server_data = JSON.parse(data);
-                            server_data['tyler']++;
+                    if (tyler.presence.activities) {
+                        if (tyler.presence.activities[0].name === "World of Warcraft") {
+                            fs.readFile(filename, (err, data) => {
+                                if (err) throw err;
+                                server_data = JSON.parse(data);
+                                server_data['tyler']++;
 
-                            server_data = JSON.stringify(server_data, null, 2);
-                            fs.writeFileSync(filename, server_data);
-                        });
+                                server_data = JSON.stringify(server_data, null, 2);
+                                fs.writeFileSync(filename, server_data);
+                            });
+                        }
                     }
                 }, 60000);
             }

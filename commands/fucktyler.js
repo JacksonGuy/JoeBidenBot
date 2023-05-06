@@ -40,10 +40,19 @@ module.exports = {
                 }, 60000);
             }
             else if (interaction.options.getString("option") === "get") {
+                var one_day = 1000 * 60 * 60 * 24;
+                var start_date = new Date("05/09/2023");
+                var present_date = new Date();
+                var days = Math.round( (present_date - start_date) / one_day);
+
                 fs.readFile(filename, (err, data) => {
                     if (err) throw err;
                     server_data = JSON.parse(data);
-                    interaction.reply(`Tyler has played WoW for ${parseFloat(server_data['tyler']/60).toFixed(2)} hours`);
+                    var hours_played = parseFloat(server_data['tyler']/60).toFixed(2);
+
+                    interaction.reply(`
+                        Season 2 of Dragonflight:\nSince May 9, 2023, Tyler has played ${hours_played} hours of WoW.\nOn average, Tyler has played ${ hours_played / days } hours per day.
+                    `);
                 });
             }
         }

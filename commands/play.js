@@ -6,24 +6,11 @@ const {
     AudioPlayerStatus, 
 } = require("@discordjs/voice");
 const fs = require('fs');
-const { join } = require('node:path');
-const ytdl = require('ytdl-core');
-
-/*
-async function download_song(url, path) {
-    let promise = new Promise(resolve => {
-        const video = ytdl(url, { filter: 'audioandvideo', dlChunkSize: 0});
-        video.pipe(fs.createWriteStream(path));
-        console.log("Finished Downloading Song");
-        resolve(true);
-    });
-    return promise;
-}
-*/
+const play = require("play-dl");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("music")
+        .setName("play")
         .setDescription("Play youtube videos")
         .addStringOption(option => 
             option
@@ -33,6 +20,10 @@ module.exports = {
         async execute(interaction) {
             let url = interaction.options.getString("url");
             
+            const stream = await play.stream(url, {
+                discordPlayerCompatibility: true,
+            });
+
             let userVoiceChannel = interaction.member.voice.channel;
             const connection = joinVoiceChannel({
                 channelId: userVoiceChannel.id,
@@ -48,11 +39,10 @@ module.exports = {
 
             const audioPlayer = createAudioPlayer();
             connection.subscribe(audioPlayer);
-            interaction.reply(`Playing: ${url}`);
-            
-            const stream = ytdl(url, { filter: 'audioonly', dlChunkSize: 0 });
 
-            audioPlayer.play(createAudioResource(stream));
+            audioPlayer.play(createAudioResource(stream.stream, {inputType: stream.type}));
+            
+            interaction.reply(`Playing: ${url}`);
 
             audioPlayer.on('error', error => {
                 console.log(error);

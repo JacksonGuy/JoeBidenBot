@@ -1,0 +1,25 @@
+{
+  "name": "joebidenbot",
+  "version": "1.0.0",
+  "description": "Discord Bot",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JacksonGuy/JoeBidenBot.git"
+  },
+  "author": "Jackson Frey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JacksonGuy/JoeBidenBot/issues"
+  },
+  "homepage": "https://github.com/JacksonGuy/JoeBidenBot#readme",
+  "keywords": [],
+  "dependencies": {
+    "@discordjs/voice": "^0.17.0",
+    "libsodium-wrappers": "^0.7.13",
+    "play-dl": "^1.9.7"
+  }
+}

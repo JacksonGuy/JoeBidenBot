@@ -18,6 +18,7 @@ const audioPlayer = createAudioPlayer();
 audioPlayer.on(AudioPlayerStatus.Idle, () => {
     let next = get_queue();
     if (next == -1) {
+        isPlaying = false;
         connection.destroy();
         return;
     }
@@ -48,11 +49,11 @@ async function play_song(song) {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("play")
-        .setDescription("Play youtube videos")
+        .setDescription("Play youtube videos.")
         .addStringOption(option => 
             option
                 .setName("url")
-                .setDescription("Youtube video link")
+                .setDescription("Youtube video link, or type \"skip\" to skip the currently playing song.")
                 .setRequired(true)),
         async execute(interaction) {
             let url = interaction.options.getString("url");
